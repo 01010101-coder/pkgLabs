@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Color Systems{% endblock %}
+
+{% block content %}
+    <h2>Convert Colors Between CMYK, LAB, and HSV</h2>
+
+    <form id="colorForm">
+        <!-- CMYK поля -->
+        <fieldset>
+            <legend>CMYK:</legend>
+            <label for="c">C: </label>
+            <input type="number" id="c" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
+            <label for="m">M: </label>
+            <input type="number" id="m" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
+            <label for="y">Y: </label>
+            <input type="number" id="y" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
+            <label for="k">K: </label>
+            <input type="number" id="k" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
+        </fieldset>
+
+        <!-- LAB поля -->
+        <fieldset>
+            <legend>LAB:</legend>
+            <label for="l">L: </label>
+            <input type="number" id="l" min="0" max="100" step="0.01" value="100" oninput="sendColorFromLAB()" class="wide-input">
+            <label for="a">A: </label>
+            <input type="number" id="a" min="-128" max="127" step="0.01" value="0" oninput="sendColorFromLAB()" class="wide-input">
+            <label for="b">B: </label>
+            <input type="number" id="b_lab" min="-128" max="127" step="0.01" value="0" oninput="sendColorFromLAB()" class="wide-input">
+        </fieldset>
+
+        <!-- HSV поля -->
+        <fieldset>
+            <legend>HSV:</legend>
+            <label for="h">H: </label>
+            <input type="number" id="h" min="0" max="360" step="0.01" value="0" oninput="sendColorFromHSV()" class="wide-input">
+            <label for="s">S: </label>
+            <input type="number" id="s" min="0" max="1" step="0.01" value="0" oninput="sendColorFromHSV()" class="wide-input">
+            <label for="v">V: </label>
+            <input type="number" id="v" min="0" max="1" step="0.01" value="1" oninput="sendColorFromHSV()" class="wide-input">
+        </fieldset>
+
+        <!-- Элемент для выбора цвета с палитры -->
+        <fieldset>
+            <legend>Color Picker:</legend>
+            <label for="colorPicker">Choose Color: </label>
+            <input type="color" id="colorPicker" value="#ffffff" onchange="updateFromPicker()">
+        </fieldset>
+    </form>
+
+    <!-- Круг, отображающий текущий цвет -->
+    <div id="colorDisplay" class="color-circle"></div>
+
+    <style>
+        .wide-input {
+            width: 100px; /* Увеличиваем ширину поля */
+            padding: 5px;
+            margin: 5px;
+            font-size: 16px;
+        }
+
+        fieldset {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: inline-block;
+            width: 30px;
+        }
+
+        /* Стили для круга с цветом */
+        .color-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            margin-top: 20px;
+            border: 2px solid #000;
+        }
+    </style>
+
+    <script>
+        // Функция отправки данных на сервер для CMYK
+        function sendColorFromCMYK() {
+            const c = document.getElementById("c").value;
+            const m = document.getElementById("m").value;
+            const y = document.getElementById("y").value;
+            const k = document.getElementById("k").value;
+
+            fetch('/convert/cmyk', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ c: c, m: m, y: y, k: k }),
+            })
+            .then(response => response.json())
+            .then(updateFields);
+        }
+
+        // Функция отправки данных на сервер для LAB
+        function sendColorFromLAB() {
+            const l = document.getElementById("l").value;
+            const a = document.getElementById("a").value;
+            const b_lab = document.getElementById("b_lab").value;
+
+            fetch('/convert/lab', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ l: l, a: a, b_lab: b_lab }),
+            })
+            .then(response => response.json())
+            .then(updateFields);
+        }
+
+        // Функция отправки данных на сервер для HSV
+        function sendColorFromHSV() {
+            const h = document.getElementById("h").value;
+            const s = document.getElementById("s").value;
+            const v = document.getElementById("v").value;
+
+            fetch('/convert/hsv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ h: h, s: s, v: v }),
+            })
+            .then(response => response.json())
+            .then(updateFields);
+        }
+
+        // Обновляем поля на основе данных с сервера
+        function updateFields(data) {
+            // Обновляем поля CMYK
+            document.getElementById("c").value = data.cmyk.c.toFixed(2);
+            document.getElementById("m").value = data.cmyk.m.toFixed(2);
+            document.getElementById("y").value = data.cmyk.y.toFixed(2);
+            document.getElementById("k").value = data.cmyk.k.toFixed(2);
+
+            // Обновляем поля LAB
+            document.getElementById("l").value = data.lab.l.toFixed(2);
+            document.getElementById("a").value = data.lab.a.toFixed(2);
+            document.getElementById("b_lab").value = data.lab.b.toFixed(2);
+
+            // Обновляем поля HSV
+            document.getElementById("h").value = data.hsv.h.toFixed(2);
+            document.getElementById("s").value = data.hsv.s.toFixed(2);
+            document.getElementById("v").value = data.hsv.v.toFixed(2);
+
+            // Обновляем цвет круга
+            updateColorCircle();
+        }
+
+        // Функция обновления круга цвета
+        function updateColorCircle() {
+            const c = document.getElementById("c").value;
+            const m = document.getElementById("m").value;
+            const y = document.getElementById("y").value;
+            const k = document.getElementById("k").value;
+
+            // Пример: преобразуем CMYK в RGB для отображения цвета
+            const r = Math.round(255 * (1 - c) * (1 - k));
+            const g = Math.round(255 * (1 - m) * (1 - k));
+            const b = Math.round(255 * (1 - y) * (1 - k));
+
+            // Устанавливаем цвет круга
+            document.getElementById("colorDisplay").style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Функция обработки выбора цвета из палитры
+        function updateFromPicker() {
+            const color = document.getElementById("colorPicker").value;
+            document.getElementById("colorDisplay").style.backgroundColor = color;
+
+            // Преобразуем цвет из HEX в RGB
+            const r = parseInt(color.slice(1, 3), 16);
+            const g = parseInt(color.slice(3, 5), 16);
+            const b = parseInt(color.slice(5, 7), 16);
+
+            // Преобразуем RGB в CMYK для полей ввода (пример):
+            const k = 1 - Math.max(r / 255, g / 255, b / 255);
+            const c = (1 - r / 255 - k) / (1 - k);
+            const m = (1 - g / 255 - k) / (1 - k);
+            const y = (1 - b / 255 - k) / (1 - k);
+
+            document.getElementById("c").value = c.toFixed(2);
+            document.getElementById("m").value = m.toFixed(2);
+            document.getElementById("y").value = y.toFixed(2);
+            document.getElementById("k").value = k.toFixed(2);
+
+            // Отправляем на сервер обновлённые значения CMYK
+            sendColorFromCMYK();
+        }
+
+        // Отправляем данные на сервер при загрузке страницы (для установки дефолтного цвета)
+        window.onload = function() {
+            sendColorFromCMYK();
+        };
+    </script>
+{% endblock %}
