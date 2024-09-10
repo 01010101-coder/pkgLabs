@@ -11,12 +11,19 @@
             <legend>CMYK:</legend>
             <label for="c">C: </label>
             <input type="number" id="c" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
+            <input type="range" id="c_range" min="0" max="1" step="0.01" value="0" oninput="syncCMYKSlider('c', 'c_range')" class="slider">
+
             <label for="m">M: </label>
             <input type="number" id="m" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
+            <input type="range" id="m_range" min="0" max="1" step="0.01" value="0" oninput="syncCMYKSlider('m', 'm_range')" class="slider">
+
             <label for="y">Y: </label>
             <input type="number" id="y" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
+            <input type="range" id="y_range" min="0" max="1" step="0.01" value="0" oninput="syncCMYKSlider('y', 'y_range')" class="slider">
+
             <label for="k">K: </label>
             <input type="number" id="k" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
+            <input type="range" id="k_range" min="0" max="1" step="0.01" value="0" oninput="syncCMYKSlider('k', 'k_range')" class="slider">
         </fieldset>
 
         <!-- LAB поля -->
@@ -24,10 +31,15 @@
             <legend>LAB:</legend>
             <label for="l">L: </label>
             <input type="number" id="l" min="0" max="100" step="0.01" value="100" oninput="sendColorFromLAB()" class="wide-input">
+            <input type="range" id="l_range" min="0" max="100" step="0.01" value="100" oninput="syncLABSlider('l', 'l_range')" class="slider">
+
             <label for="a">A: </label>
             <input type="number" id="a" min="-128" max="127" step="0.01" value="0" oninput="sendColorFromLAB()" class="wide-input">
+            <input type="range" id="a_range" min="-128" max="127" step="0.01" value="0" oninput="syncLABSlider('a', 'a_range')" class="slider">
+
             <label for="b">B: </label>
             <input type="number" id="b_lab" min="-128" max="127" step="0.01" value="0" oninput="sendColorFromLAB()" class="wide-input">
+            <input type="range" id="b_lab_range" min="-128" max="127" step="0.01" value="0" oninput="syncLABSlider('b_lab', 'b_lab_range')" class="slider">
         </fieldset>
 
         <!-- HSV поля -->
@@ -35,10 +47,15 @@
             <legend>HSV:</legend>
             <label for="h">H: </label>
             <input type="number" id="h" min="0" max="360" step="0.01" value="0" oninput="sendColorFromHSV()" class="wide-input">
+            <input type="range" id="h_range" min="0" max="360" step="0.01" value="0" oninput="syncHSVSlider('h', 'h_range')" class="slider">
+
             <label for="s">S: </label>
             <input type="number" id="s" min="0" max="1" step="0.01" value="0" oninput="sendColorFromHSV()" class="wide-input">
+            <input type="range" id="s_range" min="0" max="1" step="0.01" value="0" oninput="syncHSVSlider('s', 's_range')" class="slider">
+
             <label for="v">V: </label>
             <input type="number" id="v" min="0" max="1" step="0.01" value="1" oninput="sendColorFromHSV()" class="wide-input">
+            <input type="range" id="v_range" min="0" max="1" step="0.01" value="1" oninput="syncHSVSlider('v', 'v_range')" class="slider">
         </fieldset>
 
         <!-- Элемент для выбора цвета с палитры -->
@@ -58,6 +75,11 @@
             padding: 5px;
             margin: 5px;
             font-size: 16px;
+        }
+
+        .slider {
+            width: 200px;
+            margin: 5px;
         }
 
         fieldset {
@@ -81,6 +103,24 @@
     </style>
 
     <script>
+        // Функции для синхронизации ползунков с полями CMYK
+        function syncCMYKSlider(inputId, sliderId) {
+            document.getElementById(inputId).value = document.getElementById(sliderId).value;
+            sendColorFromCMYK();
+        }
+
+        // Функции для синхронизации ползунков с полями LAB
+        function syncLABSlider(inputId, sliderId) {
+            document.getElementById(inputId).value = document.getElementById(sliderId).value;
+            sendColorFromLAB();
+        }
+
+        // Функции для синхронизации ползунков с полями HSV
+        function syncHSVSlider(inputId, sliderId) {
+            document.getElementById(inputId).value = document.getElementById(sliderId).value;
+            sendColorFromHSV();
+        }
+
         // Функция отправки данных на сервер для CMYK
         function sendColorFromCMYK() {
             const c = document.getElementById("c").value;
@@ -137,19 +177,29 @@
         function updateFields(data) {
             // Обновляем поля CMYK
             document.getElementById("c").value = data.cmyk.c.toFixed(2);
+            document.getElementById("c_range").value = data.cmyk.c.toFixed(2);
             document.getElementById("m").value = data.cmyk.m.toFixed(2);
+            document.getElementById("m_range").value = data.cmyk.m.toFixed(2);
             document.getElementById("y").value = data.cmyk.y.toFixed(2);
+            document.getElementById("y_range").value = data.cmyk.y.toFixed(2);
             document.getElementById("k").value = data.cmyk.k.toFixed(2);
+            document.getElementById("k_range").value = data.cmyk.k.toFixed(2);
 
             // Обновляем поля LAB
             document.getElementById("l").value = data.lab.l.toFixed(2);
+            document.getElementById("l_range").value = data.lab.l.toFixed(2);
             document.getElementById("a").value = data.lab.a.toFixed(2);
+            document.getElementById("a_range").value = data.lab.a.toFixed(2);
             document.getElementById("b_lab").value = data.lab.b.toFixed(2);
+            document.getElementById("b_lab_range").value = data.lab.b.toFixed(2);
 
             // Обновляем поля HSV
             document.getElementById("h").value = data.hsv.h.toFixed(2);
+            document.getElementById("h_range").value = data.hsv.h.toFixed(2);
             document.getElementById("s").value = data.hsv.s.toFixed(2);
+            document.getElementById("s_range").value = data.hsv.s.toFixed(2);
             document.getElementById("v").value = data.hsv.v.toFixed(2);
+            document.getElementById("v_range").value = data.hsv.v.toFixed(2);
 
             // Обновляем цвет круга
             updateColorCircle();
@@ -162,12 +212,10 @@
             const y = document.getElementById("y").value;
             const k = document.getElementById("k").value;
 
-            // Пример: преобразуем CMYK в RGB для отображения цвета
             const r = Math.round(255 * (1 - c) * (1 - k));
             const g = Math.round(255 * (1 - m) * (1 - k));
             const b = Math.round(255 * (1 - y) * (1 - k));
 
-            // Устанавливаем цвет круга
             document.getElementById("colorDisplay").style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
         }
 
@@ -176,12 +224,10 @@
             const color = document.getElementById("colorPicker").value;
             document.getElementById("colorDisplay").style.backgroundColor = color;
 
-            // Преобразуем цвет из HEX в RGB
             const r = parseInt(color.slice(1, 3), 16);
             const g = parseInt(color.slice(3, 5), 16);
             const b = parseInt(color.slice(5, 7), 16);
 
-            // Преобразуем RGB в CMYK для полей ввода (пример):
             const k = 1 - Math.max(r / 255, g / 255, b / 255);
             const c = (1 - r / 255 - k) / (1 - k);
             const m = (1 - g / 255 - k) / (1 - k);
@@ -192,11 +238,9 @@
             document.getElementById("y").value = y.toFixed(2);
             document.getElementById("k").value = k.toFixed(2);
 
-            // Отправляем на сервер обновлённые значения CMYK
             sendColorFromCMYK();
         }
 
-        // Отправляем данные на сервер при загрузке страницы (для установки дефолтного цвета)
         window.onload = function() {
             sendColorFromCMYK();
         };
