@@ -3,59 +3,78 @@
 {% block title %}Color Systems{% endblock %}
 
 {% block content %}
-    <h2>Convert Colors Between CMYK, LAB, and HSV</h2>
+    <h2>Convert Color</h2>
 
     <form id="colorForm">
-        <!-- CMYK поля -->
         <fieldset>
             <legend>CMYK:</legend>
             <label for="c">C: </label>
-            <input type="number" id="c" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
-            <input type="range" id="c_range" min="0" max="1" step="0.01" value="0" oninput="syncCMYKSlider('c', 'c_range')" class="slider">
+            <input type="number" id="c" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
+                   class="wide-input">
+            <input type="range" id="c_range" min="0" max="1" step="0.01" value="0"
+                   oninput="syncCMYKSlider('c', 'c_range')" class="slider">
 
             <label for="m">M: </label>
-            <input type="number" id="m" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
-            <input type="range" id="m_range" min="0" max="1" step="0.01" value="0" oninput="syncCMYKSlider('m', 'm_range')" class="slider">
+            <input type="number" id="m" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
+                   class="wide-input">
+            <input type="range" id="m_range" min="0" max="1" step="0.01" value="0"
+                   oninput="syncCMYKSlider('m', 'm_range')" class="slider">
 
             <label for="y">Y: </label>
-            <input type="number" id="y" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
-            <input type="range" id="y_range" min="0" max="1" step="0.01" value="0" oninput="syncCMYKSlider('y', 'y_range')" class="slider">
-
+            <input type="number" id="y" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
+                   class="wide-input">
+            <input type="range" id="y_range" min="0" max="1" step="0.01" value="0"
+                   oninput="syncCMYKSlider('y', 'y_range')" class="slider">
+            <p></p>
             <label for="k">K: </label>
-            <input type="number" id="k" min="0" max="1" step="0.01" value="0" oninput="sendColorFromCMYK()" class="wide-input">
-            <input type="range" id="k_range" min="0" max="1" step="0.01" value="0" oninput="syncCMYKSlider('k', 'k_range')" class="slider">
+            <input type="number" id="k" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
+                   class="wide-input">
+            <input type="range" id="k_range" min="0" max="1" step="0.01" value="0"
+                   oninput="syncCMYKSlider('k', 'k_range')" class="slider">
         </fieldset>
 
         <!-- LAB поля -->
         <fieldset>
             <legend>LAB:</legend>
             <label for="l">L: </label>
-            <input type="number" id="l" min="0" max="100" step="0.01" value="100" oninput="sendColorFromLAB()" class="wide-input">
-            <input type="range" id="l_range" min="0" max="100" step="0.01" value="100" oninput="syncLABSlider('l', 'l_range')" class="slider">
+            <input type="number" id="l" min="0" max="100" step="0.01" value="100" oninput="debounceSendColorFromLAB()"
+                   class="wide-input">
+            <input type="range" id="l_range" min="0" max="100" step="0.01" value="100"
+                   oninput="syncLABSlider('l', 'l_range')" class="slider">
 
             <label for="a">A: </label>
-            <input type="number" id="a" min="-128" max="127" step="0.01" value="0" oninput="sendColorFromLAB()" class="wide-input">
-            <input type="range" id="a_range" min="-128" max="127" step="0.01" value="0" oninput="syncLABSlider('a', 'a_range')" class="slider">
+            <input type="number" id="a" min="-128" max="127" step="0.01" value="0" oninput="debounceSendColorFromLAB()"
+                   class="wide-input">
+            <input type="range" id="a_range" min="-128" max="127" step="0.01" value="0"
+                   oninput="syncLABSlider('a', 'a_range')" class="slider">
 
             <label for="b">B: </label>
-            <input type="number" id="b_lab" min="-128" max="127" step="0.01" value="0" oninput="sendColorFromLAB()" class="wide-input">
-            <input type="range" id="b_lab_range" min="-128" max="127" step="0.01" value="0" oninput="syncLABSlider('b_lab', 'b_lab_range')" class="slider">
+            <input type="number" id="b_lab" min="-128" max="127" step="0.01" value="0"
+                   oninput="debounceSendColorFromLAB()" class="wide-input">
+            <input type="range" id="b_lab_range" min="-128" max="127" step="0.01" value="0"
+                   oninput="syncLABSlider('b_lab', 'b_lab_range')" class="slider">
         </fieldset>
 
         <!-- HSV поля -->
         <fieldset>
             <legend>HSV:</legend>
             <label for="h">H: </label>
-            <input type="number" id="h" min="0" max="360" step="0.01" value="0" oninput="sendColorFromHSV()" class="wide-input">
-            <input type="range" id="h_range" min="0" max="360" step="0.01" value="0" oninput="syncHSVSlider('h', 'h_range')" class="slider">
+            <input type="number" id="h" min="0" max="360" step="0.01" value="0" oninput="debounceSendColorFromHSV()"
+                   class="wide-input">
+            <input type="range" id="h_range" min="0" max="360" step="0.01" value="0"
+                   oninput="syncHSVSlider('h', 'h_range')" class="slider">
 
             <label for="s">S: </label>
-            <input type="number" id="s" min="0" max="1" step="0.01" value="0" oninput="sendColorFromHSV()" class="wide-input">
-            <input type="range" id="s_range" min="0" max="1" step="0.01" value="0" oninput="syncHSVSlider('s', 's_range')" class="slider">
+            <input type="number" id="s" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromHSV()"
+                   class="wide-input">
+            <input type="range" id="s_range" min="0" max="1" step="0.01" value="0"
+                   oninput="syncHSVSlider('s', 's_range')" class="slider">
 
             <label for="v">V: </label>
-            <input type="number" id="v" min="0" max="1" step="0.01" value="1" oninput="sendColorFromHSV()" class="wide-input">
-            <input type="range" id="v_range" min="0" max="1" step="0.01" value="1" oninput="syncHSVSlider('v', 'v_range')" class="slider">
+            <input type="number" id="v" min="0" max="1" step="0.01" value="1" oninput="debounceSendColorFromHSV()"
+                   class="wide-input">
+            <input type="range" id="v_range" min="0" max="1" step="0.01" value="1"
+                   oninput="syncHSVSlider('v', 'v_range')" class="slider">
         </fieldset>
 
         <!-- Элемент для выбора цвета с палитры -->
@@ -103,6 +122,24 @@
     </style>
 
     <script>
+        function debounce(func, delay) {
+            let timeout;
+            return function () {
+                clearTimeout(timeout);
+                timeout = setTimeout(func, delay);
+            };
+        }
+
+        const debounceSendColorFromCMYK = debounce(function () {
+            sendColorFromCMYK();
+        }, 500)
+        const debounceSendColorFromLAB = debounce(function () {
+            sendColorFromLAB();
+        }, 500); // 500 миллисекунд задержки
+        const debounceSendColorFromHSV = debounce(function () {
+            sendColorFromHSV();
+        }, 500)
+
         // Функции для синхронизации ползунков с полями CMYK
         function syncCMYKSlider(inputId, sliderId) {
             document.getElementById(inputId).value = document.getElementById(sliderId).value;
@@ -133,10 +170,10 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ c: c, m: m, y: y, k: k }),
+                body: JSON.stringify({c: c, m: m, y: y, k: k}),
             })
-            .then(response => response.json())
-            .then(updateFields);
+                .then(response => response.json())
+                .then(updateFields);
         }
 
         // Функция отправки данных на сервер для LAB
@@ -150,10 +187,10 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ l: l, a: a, b_lab: b_lab }),
+                body: JSON.stringify({l: l, a: a, b_lab: b_lab}),
             })
-            .then(response => response.json())
-            .then(updateFields);
+                .then(response => response.json())
+                .then(updateFields);
         }
 
         // Функция отправки данных на сервер для HSV
@@ -167,10 +204,10 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ h: h, s: s, v: v }),
+                body: JSON.stringify({h: h, s: s, v: v}),
             })
-            .then(response => response.json())
-            .then(updateFields);
+                .then(response => response.json())
+                .then(updateFields);
         }
 
         // Обновляем поля на основе данных с сервера
@@ -241,7 +278,7 @@
             sendColorFromCMYK();
         }
 
-        window.onload = function() {
+        window.onload = function () {
             sendColorFromCMYK();
         };
     </script>
