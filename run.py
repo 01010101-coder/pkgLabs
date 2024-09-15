@@ -11,7 +11,3 @@ app.register_blueprint(main_bp)
 
 app.register_blueprint(vlad_laba1_bp)
 app.register_blueprint(vlad_main)
-#
-#
-# if __name__ == '__main__':
-#     app.run()
