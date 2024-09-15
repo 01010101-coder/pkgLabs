@@ -1,12 +1,12 @@
 from flask import request, jsonify, render_template
 from app.vlad.laba1.convertfunc import *
 
-from . import laba1_bp
+from . import vlad_laba1_bp as laba1_bp
 
 
-@laba1_bp.route('/')
+@laba1_bp.route('/vlad/laba1')
 def index():
-    return render_template('index.html')
+    return render_template('laba1/index.html')
 
 
 # Преобразование CMYK в LAB и HSV
@@ -76,4 +76,3 @@ def convert_hsv():
         'lab': {'l': l, 'a': a, 'b': b_lab},
         'hsv': {'h': h, 's': s, 'v': v}
     })
-
