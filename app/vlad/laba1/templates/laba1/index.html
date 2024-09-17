@@ -7,29 +7,29 @@
 
     <form id="colorForm">
         <fieldset>
-            <legend>CMYK:</legend>
+            <legend>CMYK (в процентах):</legend>
             <label for="c">C: </label>
-            <input type="number" id="c" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
+            <input type="number" id="c" min="0" max="100" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
                    class="wide-input">
-            <input type="range" id="c_range" min="0" max="1" step="0.01" value="0"
+            <input type="range" id="c_range" min="0" max="100" step="0.01" value="0"
                    oninput="syncCMYKSlider('c', 'c_range')" class="slider">
 
             <label for="m">M: </label>
-            <input type="number" id="m" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
+            <input type="number" id="m" min="0" max="100" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
                    class="wide-input">
-            <input type="range" id="m_range" min="0" max="1" step="0.01" value="0"
+            <input type="range" id="m_range" min="0" max="100" step="0.01" value="0"
                    oninput="syncCMYKSlider('m', 'm_range')" class="slider">
 
             <label for="y">Y: </label>
-            <input type="number" id="y" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
+            <input type="number" id="y" min="0" max="100" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
                    class="wide-input">
-            <input type="range" id="y_range" min="0" max="1" step="0.01" value="0"
+            <input type="range" id="y_range" min="0" max="100" step="0.01" value="0"
                    oninput="syncCMYKSlider('y', 'y_range')" class="slider">
             <p></p>
             <label for="k">K: </label>
-            <input type="number" id="k" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
+            <input type="number" id="k" min="0" max="100" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
                    class="wide-input">
-            <input type="range" id="k_range" min="0" max="1" step="0.01" value="0"
+            <input type="range" id="k_range" min="0" max="100" step="0.01" value="0"
                    oninput="syncCMYKSlider('k', 'k_range')" class="slider">
         </fieldset>
 
@@ -65,23 +65,23 @@
                    oninput="syncHSVSlider('h', 'h_range')" class="slider">
 
             <label for="s">S: </label>
-            <input type="number" id="s" min="0" max="1" step="0.01" value="0" oninput="debounceSendColorFromHSV()"
+            <input type="number" id="s" min="0" max="100" step="0.01" value="0" oninput="debounceSendColorFromHSV()"
                    class="wide-input">
-            <input type="range" id="s_range" min="0" max="1" step="0.01" value="0"
+            <input type="range" id="s_range" min="0" max="100" step="0.01" value="0"
                    oninput="syncHSVSlider('s', 's_range')" class="slider">
 
             <label for="v">V: </label>
-            <input type="number" id="v" min="0" max="1" step="0.01" value="1" oninput="debounceSendColorFromHSV()"
+            <input type="number" id="v" min="0" max="100" step="0.01" value="100" oninput="debounceSendColorFromHSV()"
                    class="wide-input">
-            <input type="range" id="v_range" min="0" max="1" step="0.01" value="1"
+            <input type="range" id="v_range" min="0" max="100" step="0.01" value="100"
                    oninput="syncHSVSlider('v', 'v_range')" class="slider">
         </fieldset>
 
         <!-- Элемент для выбора цвета с палитры -->
         <fieldset>
             <legend>Color Picker:</legend>
-            <label for="colorPicker">Choose Color: </label>
-            <input type="color" id="colorPicker" value="#ffffff" onchange="updateFromPicker()">
+            <p><label for="colorPicker">Choose Color: </label></p>
+            <p><input type="color" id="colorPicker" value="#ffffff" onchange="updateFromPicker()"></p>
         </fieldset>
     </form>
 
@@ -160,10 +160,10 @@
 
         // Функция отправки данных на сервер для CMYK
         function sendColorFromCMYK() {
-            const c = document.getElementById("c").value;
-            const m = document.getElementById("m").value;
-            const y = document.getElementById("y").value;
-            const k = document.getElementById("k").value;
+            const c = document.getElementById("c").value / 100;
+            const m = document.getElementById("m").value / 100;
+            const y = document.getElementById("y").value / 100;
+            const k = document.getElementById("k").value / 100;
 
             fetch('/convert/cmyk', {
                 method: 'POST',
@@ -195,9 +195,9 @@
 
         // Функция отправки данных на сервер для HSV
         function sendColorFromHSV() {
-            const h = document.getElementById("h").value;
-            const s = document.getElementById("s").value;
-            const v = document.getElementById("v").value;
+            const h = Math.min(Math.max(document.getElementById("h").value, 0), 360); // Убедимся, что h в пределах 0-360
+            const s = Math.min(Math.max(document.getElementById("s").value, 0), 100) / 100; // Убедимся, что s в пределах 0-100
+            const v = Math.min(Math.max(document.getElementById("v").value, 0), 100) / 100; // Убедимся, что v в пределах 0-100
 
             fetch('/convert/hsv', {
                 method: 'POST',
@@ -210,17 +210,18 @@
                 .then(updateFields);
         }
 
+
         // Обновляем поля на основе данных с сервера
         function updateFields(data) {
             // Обновляем поля CMYK
-            document.getElementById("c").value = data.cmyk.c.toFixed(2);
-            document.getElementById("c_range").value = data.cmyk.c.toFixed(2);
-            document.getElementById("m").value = data.cmyk.m.toFixed(2);
-            document.getElementById("m_range").value = data.cmyk.m.toFixed(2);
-            document.getElementById("y").value = data.cmyk.y.toFixed(2);
-            document.getElementById("y_range").value = data.cmyk.y.toFixed(2);
-            document.getElementById("k").value = data.cmyk.k.toFixed(2);
-            document.getElementById("k_range").value = data.cmyk.k.toFixed(2);
+            document.getElementById("c").value = (data.cmyk.c * 100).toFixed(2);
+            document.getElementById("c_range").value = (data.cmyk.c * 100).toFixed(2);
+            document.getElementById("m").value = (data.cmyk.m * 100).toFixed(2);
+            document.getElementById("m_range").value = (data.cmyk.m * 100).toFixed(2);
+            document.getElementById("y").value = (data.cmyk.y * 100).toFixed(2);
+            document.getElementById("y_range").value = (data.cmyk.y * 100).toFixed(2);
+            document.getElementById("k").value = (data.cmyk.k * 100).toFixed(2);
+            document.getElementById("k_range").value = (data.cmyk.k * 100).toFixed(2);
 
             // Обновляем поля LAB
             document.getElementById("l").value = data.lab.l.toFixed(2);
@@ -233,10 +234,10 @@
             // Обновляем поля HSV
             document.getElementById("h").value = data.hsv.h.toFixed(2);
             document.getElementById("h_range").value = data.hsv.h.toFixed(2);
-            document.getElementById("s").value = data.hsv.s.toFixed(2);
-            document.getElementById("s_range").value = data.hsv.s.toFixed(2);
-            document.getElementById("v").value = data.hsv.v.toFixed(2);
-            document.getElementById("v_range").value = data.hsv.v.toFixed(2);
+            document.getElementById("s").value = (data.hsv.s * 100).toFixed(2);
+            document.getElementById("s_range").value = (data.hsv.s * 100).toFixed(2);
+            document.getElementById("v").value = (data.hsv.v * 100).toFixed(2);
+            document.getElementById("v_range").value = (data.hsv.v * 100).toFixed(2);
 
             // Обновляем цвет круга
             updateColorCircle();
@@ -244,10 +245,10 @@
 
         // Функция обновления круга цвета
         function updateColorCircle() {
-            const c = document.getElementById("c").value;
-            const m = document.getElementById("m").value;
-            const y = document.getElementById("y").value;
-            const k = document.getElementById("k").value;
+            const c = document.getElementById("c").value / 100;
+            const m = document.getElementById("m").value / 100;
+            const y = document.getElementById("y").value / 100;
+            const k = document.getElementById("k").value / 100;
 
             const r = Math.round(255 * (1 - c) * (1 - k));
             const g = Math.round(255 * (1 - m) * (1 - k));
@@ -270,10 +271,10 @@
             const m = (1 - g / 255 - k) / (1 - k);
             const y = (1 - b / 255 - k) / (1 - k);
 
-            document.getElementById("c").value = c.toFixed(2);
-            document.getElementById("m").value = m.toFixed(2);
-            document.getElementById("y").value = y.toFixed(2);
-            document.getElementById("k").value = k.toFixed(2);
+            document.getElementById("c").value = (c * 100).toFixed(2);
+            document.getElementById("m").value = (m * 100).toFixed(2);
+            document.getElementById("y").value = (y * 100).toFixed(2);
+            document.getElementById("k").value = (k * 100).toFixed(2);
 
             sendColorFromCMYK();
         }

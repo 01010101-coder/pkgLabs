@@ -62,7 +62,7 @@ def convert_hsv():
     h, s, v = float(data['h']), float(data['s']), float(data['v'])
 
     # Конвертация HSV в RGB
-    r, g, b = hsv_to_rgb(h, s, v)
+    r, g, b = hsv_to_rgb(h, s * 100, v * 100)
 
     # Конвертация RGB в CMYK
     c, m, y, k = rgb_to_cmyk(r, g, b)
