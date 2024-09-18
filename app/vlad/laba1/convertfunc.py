@@ -91,6 +91,7 @@ def lab_to_xyz(l, a, b):
 
     return x, y, z
 
+
 def rgb_to_lab(r, g, b):
     x, y, z = rgb_to_xyz(r, g, b)
     return xyz_to_lab(x, y, z)
@@ -131,7 +132,6 @@ def rgb_to_hsv(r, g, b):
     v = min(max(v, 0), 100) / 100
 
     return round(h, 2), round(s, 2), round(v, 2)
-
 
 
 def hsv_to_rgb(h, s, v):

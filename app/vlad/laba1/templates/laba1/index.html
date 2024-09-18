@@ -3,11 +3,12 @@
 {% block title %}Color Systems{% endblock %}
 
 {% block content %}
-    <h2>Convert Color</h2>
+    <h2>CMYK <=> LAB <=> HSV</h2>
+    <h3>5 вариант</h3>
 
     <form id="colorForm">
         <fieldset>
-            <legend>CMYK (в процентах):</legend>
+            <legend>CMYK:</legend>
             <label for="c">C: </label>
             <input type="number" id="c" min="0" max="100" step="0.01" value="0" oninput="debounceSendColorFromCMYK()"
                    class="wide-input">
@@ -31,6 +32,11 @@
                    class="wide-input">
             <input type="range" id="k_range" min="0" max="100" step="0.01" value="0"
                    oninput="syncCMYKSlider('k', 'k_range')" class="slider">
+            <!-- Поле для отображения значений CMYK -->
+
+            <legend>CMYK Output:</legend>
+            <p id="cmykOutput">CMYK(0.00%, 0.00%, 0.00%, 0.00%)</p>
+
         </fieldset>
 
         <!-- LAB поля -->
@@ -53,6 +59,9 @@
                    oninput="debounceSendColorFromLAB()" class="wide-input">
             <input type="range" id="b_lab_range" min="-128" max="127" step="0.01" value="0"
                    oninput="syncLABSlider('b_lab', 'b_lab_range')" class="slider">
+
+            <legend>LAB Output:</legend>
+            <p id="labOutput">LAB(0.00, 0.00, 0.00)</p>
         </fieldset>
 
         <!-- HSV поля -->
@@ -75,6 +84,9 @@
                    class="wide-input">
             <input type="range" id="v_range" min="0" max="100" step="0.01" value="100"
                    oninput="syncHSVSlider('v', 'v_range')" class="slider">
+
+            <legend>HSV Output:</legend>
+            <p id="hsvOutput">HSV(0.00, 0.00%, 0.00%)</p>
         </fieldset>
 
         <!-- Элемент для выбора цвета с палитры -->
@@ -87,6 +99,17 @@
 
     <!-- Круг, отображающий текущий цвет -->
     <div id="colorDisplay" class="color-circle"></div>
+
+    <footer>
+        <div>
+            <h3>Документация</h3>
+            <p>Чтобы перевести цвет из одной системы в другую можно использовать 3 способа. Ползунки
+                для каждой системы, ручной ввод каждого значения и выбор в палитре снизу.
+                Перевод цветов происходит через RGB, то есть в начале все переводятся в RGB, а потом высчитываются
+                для каждого свои значения.
+                Так как вычисления происходят через сервер, а не через front-end. То возможны небольшие задержки.</p>
+        </div>
+    </footer>
 
     <style>
         .wide-input {
@@ -223,6 +246,8 @@
             document.getElementById("k").value = (data.cmyk.k * 100).toFixed(2);
             document.getElementById("k_range").value = (data.cmyk.k * 100).toFixed(2);
 
+            document.getElementById("cmykOutput").innerText = `CMYK(${(data.cmyk.c * 100).toFixed(2)}%, ${(data.cmyk.m * 100).toFixed(2)}%, ${(data.cmyk.y * 100).toFixed(2)}%, ${(data.cmyk.k * 100).toFixed(2)}%)`;
+
             // Обновляем поля LAB
             document.getElementById("l").value = data.lab.l.toFixed(2);
             document.getElementById("l_range").value = data.lab.l.toFixed(2);
@@ -231,6 +256,8 @@
             document.getElementById("b_lab").value = data.lab.b.toFixed(2);
             document.getElementById("b_lab_range").value = data.lab.b.toFixed(2);
 
+            document.getElementById("labOutput").innerText = `LAB(${(data.lab.l).toFixed(2)}, ${(data.lab.a).toFixed(2)}, ${(data.lab.b).toFixed(2)})`;
+
             // Обновляем поля HSV
             document.getElementById("h").value = data.hsv.h.toFixed(2);
             document.getElementById("h_range").value = data.hsv.h.toFixed(2);
@@ -238,6 +265,8 @@
             document.getElementById("s_range").value = (data.hsv.s * 100).toFixed(2);
             document.getElementById("v").value = (data.hsv.v * 100).toFixed(2);
             document.getElementById("v_range").value = (data.hsv.v * 100).toFixed(2);
+
+            document.getElementById("hsvOutput").innerText = `HSV(${(data.hsv.h).toFixed(2)}, ${(data.hsv.s * 100).toFixed(2)}%, ${(data.hsv.v * 100).toFixed(2)}%)`;
 
             // Обновляем цвет круга
             updateColorCircle();
