@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Data</title>
+</head>
+<body>
+    <h1>Upload Images</h1>
+    <form action="/vlad/laba2" method="POST" enctype="multipart/form-data">
+        <input type="file" name="files[]" multiple>
+        <input type="submit" value="Upload">
+    </form>
+
+    <h2>Processed Images</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Filename</th>
+                <th>Size (Pixels)</th>
+                <th>DPI</th>
+                <th>Color Mode</th>
+                <th>Compression</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for image in images %}
+            <tr>
+                <td>{{ image.filename }}</td>
+                <td>{{ image.size[0] }}x{{ image.size[1] }}</td>
+                <td>{{ image.dpi }}</td>
+                <td>{{ image.mode }}</td>
+                <td>{{ image.compression }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
