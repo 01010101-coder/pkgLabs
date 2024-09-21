@@ -1,4 +1,3 @@
-import os
 import zipfile
 from flask import render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
@@ -9,75 +8,85 @@ from . import vlad_laba2_bp as laba2_bp
 UPLOAD_FOLDER = 'app/vlad/laba2/images'
 ALLOWED_EXTENSIONS = {'zip'}
 
+import logging
+import os
 
-# Проверка допустимых форматов файлов (только zip)
+# Настройка логгера
+log_file = 'app/vlad/laba2/app.log'
+logging.basicConfig(filename=log_file, level=logging.ERROR,
+                    format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+
+logger = logging.getLogger(__name__)
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# Функция очистки папки с изображениями
 def clear_upload_folder(folder):
     for root, dirs, files in os.walk(folder):
         for file in files:
             file_path = os.path.join(root, file)
             try:
                 if os.path.isfile(file_path) or os.path.islink(file_path):
-                    os.unlink(file_path)  # Удаление файлов
+                    os.unlink(file_path)
             except Exception as e:
-                print(f'Failed to delete {file_path}. Reason: {e}')
-        for dir in dirs:
-            dir_path = os.path.join(root, dir)
-            try:
-                os.rmdir(dir_path)  # Удаление пустых директорий
-            except Exception as e:
-                print(f'Failed to delete {dir_path}. Reason: {e}')
+                logger.error(f'Failed to delete {file_path}. Reason: {e}')
 
 
-# Функция очистки папки __MACOSX
 def clear_macosx_folder(folder):
     macosx_folder = os.path.join(folder, '__MACOSX')
     if os.path.exists(macosx_folder):
         for root, dirs, files in os.walk(macosx_folder, topdown=False):
             for file in files:
-                os.remove(os.path.join(root, file))
+                try:
+                    os.remove(os.path.join(root, file))
+                except Exception as e:
+                    logger.error(f'Failed to delete file {file} in __MACOSX. Reason: {e}')
             for dir in dirs:
-                os.rmdir(os.path.join(root, dir))
-        os.rmdir(macosx_folder)
+                try:
+                    os.rmdir(os.path.join(root, dir))
+                except Exception as e:
+                    logger.error(f'Failed to delete directory {dir} in __MACOSX. Reason: {e}')
+        try:
+            os.rmdir(macosx_folder)
+        except Exception as e:
+            logger.error(f'Failed to delete __MACOSX directory. Reason: {e}')
 
 
-# Функция распаковки архива
 def unzip_file(zip_path, extract_to):
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_to)
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+    except zipfile.BadZipFile as e:
+        logger.error(f'Failed to unzip file {zip_path}. Reason: {e}')
+    except Exception as e:
+        logger.error(f'Error during unzip process for file {zip_path}. Reason: {e}')
 
 
-# Маршрут для отображения и загрузки файлов
 @laba2_bp.route('/vlad/laba2', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST':
-        # Очистка папки перед загрузкой новых файлов
-        clear_upload_folder(UPLOAD_FOLDER)
+    try:
+        if request.method == 'POST':
+            clear_upload_folder(UPLOAD_FOLDER)
 
-        # Проверка наличия файлов
-        if 'files[]' not in request.files:
-            return redirect(request.url)
+            if 'files[]' not in request.files:
+                return redirect(request.url)
 
-        files = request.files.getlist('files[]')
-        for file in files:
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file_path = os.path.join(UPLOAD_FOLDER, filename)
-                file.save(file_path)
+            files = request.files.getlist('files[]')
+            for file in files:
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(UPLOAD_FOLDER, filename)
+                    file.save(file_path)
 
-                # Распаковка архива ZIP
-                unzip_file(file_path, UPLOAD_FOLDER)
+                    unzip_file(file_path, UPLOAD_FOLDER)
+                    clear_macosx_folder(UPLOAD_FOLDER)
 
-                # Удаление папки __MACOSX, если она существует
-                clear_macosx_folder(UPLOAD_FOLDER)
+            return redirect(url_for('laba2.index'))
 
-        # После загрузки и распаковки файлов происходит обработка
-        return redirect(url_for('laba2.index'))
-
-    # Обработка изображений и отображение результата
-    images = process_images_in_directory(UPLOAD_FOLDER)
-    return render_template('laba2/index.html', images=images)
+        images = process_images_in_directory(UPLOAD_FOLDER)
+        return render_template('laba2/index.html', images=images)
+    except Exception as e:
+        logger.error(f'Error in index route: {e}')
+        return render_template('error.html', error=str(e)), 500  # Возвращаем страницу с ошибкой
