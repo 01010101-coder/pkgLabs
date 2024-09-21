@@ -2,21 +2,12 @@ import zipfile
 from flask import render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from app.vlad.laba2.image_data import process_images_in_directory
+import os
 
 from . import vlad_laba2_bp as laba2_bp
 
 UPLOAD_FOLDER = 'app/vlad/laba2/images'
 ALLOWED_EXTENSIONS = {'zip'}
-
-import logging
-import os
-
-# Настройка логгера
-log_file = 'app/vlad/laba2/application.log'
-logging.basicConfig(filename=log_file, level=logging.ERROR,
-                    format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-
-logger = logging.getLogger(__name__)
 
 
 def allowed_file(filename):
@@ -31,7 +22,7 @@ def clear_upload_folder(folder):
                 if os.path.isfile(file_path) or os.path.islink(file_path):
                     os.unlink(file_path)
             except Exception as e:
-                logger.error(f'Failed to delete {file_path}. Reason: {e}')
+                print(f'Failed to delete {file_path}. Reason: {e}')
 
 
 def clear_macosx_folder(folder):
@@ -42,16 +33,16 @@ def clear_macosx_folder(folder):
                 try:
                     os.remove(os.path.join(root, file))
                 except Exception as e:
-                    logger.error(f'Failed to delete file {file} in __MACOSX. Reason: {e}')
+                    print(f'Failed to delete file {file} in __MACOSX. Reason: {e}')
             for dir in dirs:
                 try:
                     os.rmdir(os.path.join(root, dir))
                 except Exception as e:
-                    logger.error(f'Failed to delete directory {dir} in __MACOSX. Reason: {e}')
+                    print(f'Failed to delete directory {dir} in __MACOSX. Reason: {e}')
         try:
             os.rmdir(macosx_folder)
         except Exception as e:
-            logger.error(f'Failed to delete __MACOSX directory. Reason: {e}')
+            print(f'Failed to delete __MACOSX directory. Reason: {e}')
 
 
 def unzip_file(zip_path, extract_to):
@@ -59,9 +50,9 @@ def unzip_file(zip_path, extract_to):
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(extract_to)
     except zipfile.BadZipFile as e:
-        logger.error(f'Failed to unzip file {zip_path}. Reason: {e}')
+        print(f'Failed to unzip file {zip_path}. Reason: {e}')
     except Exception as e:
-        logger.error(f'Error during unzip process for file {zip_path}. Reason: {e}')
+        print(f'Error during unzip process for file {zip_path}. Reason: {e}')
 
 
 @laba2_bp.route('/vlad/laba2', methods=['GET', 'POST'])
@@ -88,5 +79,5 @@ def index():
         images = process_images_in_directory(UPLOAD_FOLDER)
         return render_template('laba2/index.html', images=images)
     except Exception as e:
-        logger.error(f'Error in index route: {e}')
+        print(f'Error in index route: {e}')
         return render_template('error.html', error=str(e)), 500  # Возвращаем страницу с ошибкой
