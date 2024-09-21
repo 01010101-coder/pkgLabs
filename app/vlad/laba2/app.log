@@ -1,0 +1,18 @@
+2024-09-21 15:25:59,444 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000 [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:25:59,444 INFO: [33mPress CTRL+C to quit[0m [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:26:12,318 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000 [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:26:12,319 INFO: [33mPress CTRL+C to quit[0m [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:26:44,240 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000 [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:26:44,240 INFO: [33mPress CTRL+C to quit[0m [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:27:09,536 INFO: 127.0.0.1 - - [21/Sep/2024 15:27:09] "GET / HTTP/1.1" 200 - [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:27:10,747 INFO: 127.0.0.1 - - [21/Sep/2024 15:27:10] "GET /vlad/ HTTP/1.1" 200 - [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:27:12,269 INFO: 127.0.0.1 - - [21/Sep/2024 15:27:12] "GET /vlad/laba2 HTTP/1.1" 200 - [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:27:18,339 INFO: 127.0.0.1 - - [21/Sep/2024 15:27:18] "[32mPOST /vlad/laba2 HTTP/1.1[0m" 302 - [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:27:18,349 INFO: 127.0.0.1 - - [21/Sep/2024 15:27:18] "GET /vlad/laba2 HTTP/1.1" 200 - [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:28:40,302 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000 [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:28:40,303 INFO: [33mPress CTRL+C to quit[0m [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
+2024-09-21 15:28:44,150 INFO: 127.0.0.1 - - [21/Sep/2024 15:28:44] "GET /vlad/laba2 HTTP/1.1" 200 - [in /Users/vladyahnovets/PycharmProjects/pkgLabs/.venv/lib/python3.9/site-packages/werkzeug/_internal.py:97]
