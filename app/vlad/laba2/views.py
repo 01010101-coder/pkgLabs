@@ -12,7 +12,7 @@ import logging
 import os
 
 # Настройка логгера
-log_file = 'app/vlad/laba2/app.log'
+log_file = 'app/vlad/laba2/application.log'
 logging.basicConfig(filename=log_file, level=logging.ERROR,
                     format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
 
