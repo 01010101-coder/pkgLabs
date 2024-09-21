@@ -65,6 +65,10 @@ def index():
                 return redirect(request.url)
 
             files = request.files.getlist('files[]')
+
+            if not os.path.exists(UPLOAD_FOLDER):
+                os.makedirs(UPLOAD_FOLDER)
+
             for file in files:
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
@@ -80,4 +84,4 @@ def index():
         return render_template('laba2/index.html', images=images)
     except Exception as e:
         print(f'Error in index route: {e}')
-        return render_template('error.html', error=str(e)), 500  # Возвращаем страницу с ошибкой
+        return render_template('laba2/error.html', error=str(e)), 500  # Возвращаем страницу с ошибкой
