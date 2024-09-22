@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from app.vlad.laba2.image_data import process_images_in_directory
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 from . import vlad_laba2_bp as laba2_bp
 
@@ -69,19 +70,35 @@ def index():
             if not os.path.exists(UPLOAD_FOLDER):
                 os.makedirs(UPLOAD_FOLDER)
 
-            for file in files:
-                if file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    file_path = os.path.join(UPLOAD_FOLDER, filename)
-                    file.save(file_path)
+            # Используем многопоточность для распаковки файлов
+            with ThreadPoolExecutor() as executor:
+                futures = []
+                for file in files:
+                    if file and allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        file_path = os.path.join(UPLOAD_FOLDER, filename)
+                        file.save(file_path)
 
-                    unzip_file(file_path, UPLOAD_FOLDER)
-                    clear_macosx_folder(UPLOAD_FOLDER)
+                        # Параллельно распаковываем каждый архив
+                        futures.append(executor.submit(unzip_file, file_path, UPLOAD_FOLDER))
 
-            return redirect(url_for('laba2.index'))
+                # Ожидаем завершения всех задач по распаковке
+                for future in futures:
+                    future.result()
+
+            # Убираем папку __MACOSX после распаковки
+            clear_macosx_folder(UPLOAD_FOLDER)
+
+            # Параллельная обработка изображений
+            images = process_images_in_directory(UPLOAD_FOLDER)
+
+            # Очищаем папку после обработки
+            response = render_template('laba2/index.html', images=images)
+            clear_upload_folder(UPLOAD_FOLDER)
+            return response
 
         images = process_images_in_directory(UPLOAD_FOLDER)
         return render_template('laba2/index.html', images=images)
     except Exception as e:
         print(f'Error in index route: {e}')
-        return render_template('laba2/error.html', error=str(e)), 500  # Возвращаем страницу с ошибкой
+        return render_template('laba2/error.html', error=str(e)), 500

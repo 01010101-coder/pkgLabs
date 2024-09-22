@@ -1,5 +1,6 @@
 import os
 from PIL import Image
+from concurrent.futures import ThreadPoolExecutor
 
 
 def get_image_info(image_path):
@@ -13,21 +14,31 @@ def get_image_info(image_path):
                 "compression": img.info.get("compression", "Not available")
             }
     except (IOError, OSError, Image.UnidentifiedImageError):
-        # Если файл не является изображением, пропустить его
         return None
+
+
+def process_single_image(file):
+    image_info = get_image_info(file)
+    return image_info if image_info else None
 
 
 def process_images_in_directory(directory):
     image_data = []
     supported_formats = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif', '.tiff', '.pcx')
 
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            if file.lower().endswith(supported_formats):
-                filepath = os.path.join(root, file)
-                image_info = get_image_info(filepath)
+    # Используем многопоточность для обработки изображений
+    with ThreadPoolExecutor() as executor:
+        futures = []
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                if file.lower().endswith(supported_formats):
+                    filepath = os.path.join(root, file)
+                    futures.append(executor.submit(process_single_image, filepath))
 
-                # Добавляем только валидные изображения
-                if image_info:
-                    image_data.append(image_info)
+        # Собираем результаты
+        for future in futures:
+            image_info = future.result()
+            if image_info:
+                image_data.append(image_info)
+
     return image_data
