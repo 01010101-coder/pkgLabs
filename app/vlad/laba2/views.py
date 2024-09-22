@@ -3,7 +3,9 @@ from flask import render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from app.vlad.laba2.image_data import process_images_in_directory
 import os
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
+from concurrent.futures import ProcessPoolExecutor
+from aiomultiprocess import Pool
 
 from . import vlad_laba2_bp as laba2_bp
 
@@ -15,7 +17,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def clear_upload_folder(folder):
+async def clear_upload_folder(folder):
     for root, dirs, files in os.walk(folder):
         for file in files:
             file_path = os.path.join(root, file)
@@ -26,7 +28,7 @@ def clear_upload_folder(folder):
                 print(f'Failed to delete {file_path}. Reason: {e}')
 
 
-def clear_macosx_folder(folder):
+async def clear_macosx_folder(folder):
     macosx_folder = os.path.join(folder, '__MACOSX')
     if os.path.exists(macosx_folder):
         for root, dirs, files in os.walk(macosx_folder, topdown=False):
@@ -46,7 +48,7 @@ def clear_macosx_folder(folder):
             print(f'Failed to delete __MACOSX directory. Reason: {e}')
 
 
-def unzip_file(zip_path, extract_to):
+async def unzip_file(zip_path, extract_to):
     try:
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(extract_to)
@@ -57,10 +59,11 @@ def unzip_file(zip_path, extract_to):
 
 
 @laba2_bp.route('/vlad/laba2', methods=['GET', 'POST'])
-def index():
+async def index():
     try:
         if request.method == 'POST':
-            clear_upload_folder(UPLOAD_FOLDER)
+            # Очищаем папку перед загрузкой новых файлов
+            await clear_upload_folder(UPLOAD_FOLDER)
 
             if 'files[]' not in request.files:
                 return redirect(request.url)
@@ -70,31 +73,31 @@ def index():
             if not os.path.exists(UPLOAD_FOLDER):
                 os.makedirs(UPLOAD_FOLDER)
 
-            # Используем многопоточность для распаковки файлов
-            with ThreadPoolExecutor() as executor:
-                futures = []
-                for file in files:
-                    if file and allowed_file(file.filename):
-                        filename = secure_filename(file.filename)
-                        file_path = os.path.join(UPLOAD_FOLDER, filename)
-                        file.save(file_path)
+            # Сохраняем файлы в папку перед их обработкой
+            saved_file_paths = []
+            for file in files:
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(UPLOAD_FOLDER, filename)
+                    await asyncio.to_thread(file.save, file_path)  # Асинхронно сохраняем файл
+                    saved_file_paths.append(file_path)
 
-                        # Параллельно распаковываем каждый архив
-                        futures.append(executor.submit(unzip_file, file_path, UPLOAD_FOLDER))
+            # Распаковываем файлы с помощью асинхронного пула
+            async with Pool() as pool:
+                tasks = [pool.apply(unzip_file, args=(file_path, UPLOAD_FOLDER)) for file_path in saved_file_paths]
+                await asyncio.gather(*tasks)
 
-                # Ожидаем завершения всех задач по распаковке
-                for future in futures:
-                    future.result()
+            await clear_macosx_folder(UPLOAD_FOLDER)
 
-            # Убираем папку __MACOSX после распаковки
-            clear_macosx_folder(UPLOAD_FOLDER)
+            # Обрабатываем изображения с помощью ProcessPoolExecutor
+            loop = asyncio.get_running_loop()
+            with ProcessPoolExecutor() as executor:
+                images = await loop.run_in_executor(executor, process_images_in_directory, UPLOAD_FOLDER)
 
-            # Параллельная обработка изображений
-            images = process_images_in_directory(UPLOAD_FOLDER)
-
-            # Очищаем папку после обработки
             response = render_template('laba2/index.html', images=images)
-            clear_upload_folder(UPLOAD_FOLDER)
+
+            # Очищаем папку после завершения всех операций
+            await clear_upload_folder(UPLOAD_FOLDER)
             return response
 
         images = process_images_in_directory(UPLOAD_FOLDER)
