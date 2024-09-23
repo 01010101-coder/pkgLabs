@@ -108,17 +108,34 @@ def index():
             process_time = time.time() - process_start_time
             log_performance(f'Время на обработку изображений: {process_time:.2f} секунд')
 
-            # Очищаем папку после обработки
+            # Измеряем время рендеринга шаблона
+            render_start_time = time.time()
             response = render_template('laba2/index.html', images=images)
+            render_time = time.time() - render_start_time
+            log_performance(f'Время на рендеринг шаблона: {render_time:.2f} секунд')
+
+            # Очищаем папку после обработки
             clear_upload_folder(UPLOAD_FOLDER)
 
             # Общее время выполнения запроса
             total_time = time.time() - start_time
-            log_performance(f'Общее время выполнения запроса: {total_time:.2f} секунд')
+            log_performance(f'Общее время выполнения запроса: {total_time:.2f} секунд\n')
+
             return response
 
+        # Для GET-запросов
+        process_start_time = time.time()
         images = process_images_in_directory(UPLOAD_FOLDER)
-        return render_template('laba2/index.html', images=images)
+        process_time = time.time() - process_start_time
+        log_performance(f'Время на обработку изображений: {process_time:.2f} секунд')
+
+        render_start_time = time.time()
+        response = render_template('laba2/index.html', images=images)
+        render_time = time.time() - render_start_time
+        log_performance(f'Время на рендеринг шаблона: {render_time:.2f} секунд')
+
+        return response
+
     except Exception as e:
         log_performance(f'Error in index route: {e}')
         return render_template('laba2/error.html', error=str(e)), 500
