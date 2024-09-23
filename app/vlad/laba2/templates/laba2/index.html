@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Data</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 </head>
 <body>
     <h1>Upload Images</h1>
@@ -13,7 +14,7 @@
     </form>
 
     <h2>Processed Images</h2>
-    <table border="1">
+    <table id="imageTable" class="display" border="1">
         <thead>
             <tr>
                 <th>Filename</th>
@@ -35,5 +36,25 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#imageTable').DataTable({
+                "paging": true,  // Пагинация
+                "searching": true,  // Поиск
+                "ordering": true,  // Сортировка
+                "order": [[ 0, "asc" ]],  // Сортировка по умолчанию по первой колонке (Filename)
+                "columnDefs": [
+                    { "orderable": true, "targets": 0 },  // Включить сортировку по Filename
+                    { "orderable": true, "targets": 1 },  // Включить сортировку по Size
+                    { "orderable": true, "targets": 2 },  // Включить сортировку по DPI
+                    { "orderable": true, "targets": 3 },  // Включить сортировку по Color Mode
+                    { "orderable": true, "targets": 4 }   // Включить сортировку по Compression
+                ]
+            });
+        });
+    </script>
 </body>
 </html>
