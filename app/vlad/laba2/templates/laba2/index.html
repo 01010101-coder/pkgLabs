@@ -7,54 +7,59 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 </head>
 <body>
-    <h1>Upload Images</h1>
-    <form action="/vlad/laba2" method="POST" enctype="multipart/form-data">
-        <input type="file" name="files[]" multiple>
-        <input type="submit" value="Upload">
-    </form>
+<h1>Upload Images</h1>
+<form action="/vlad/laba2" method="POST" enctype="multipart/form-data">
+    <input type="file" name="files[]" multiple>
+    <input type="submit" value="Upload">
+</form>
 
-    <h2>Processed Images</h2>
-    <table id="imageTable" class="display" border="1">
-        <thead>
-            <tr>
-                <th>Filename</th>
-                <th>Size (Pixels)</th>
-                <th>DPI</th>
-                <th>Color Mode</th>
-                <th>Compression</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for image in images %}
-            <tr>
-                <td>{{ image.filename }}</td>
-                <td>{{ image.size[0] }}x{{ image.size[1] }}</td>
-                <td>{{ image.dpi }}</td>
-                <td>{{ image.mode }}</td>
-                <td>{{ image.compression }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h2>Processed Images</h2>
+<table id="imageTable" class="display" border="1">
+    <thead>
+    <tr>
+        <th>Format</th>
+        <th>Filename</th>
+        <th>Size (Pixels)</th>
+        <th>DPI</th>
+        <th>Color Mode</th>
+        <th>Compression</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for image in images %}
+        <tr>
+            <td>{{ image.format }}</td>
+            <td>{{ image.filename }}</td>
+            <td>{{ image.size[0] }}x{{ image.size[1] }}</td>
+            <td>{{ image.dpi }}</td>
+            <td>{{ image.mode }}</td>
+            <td>{{ image.compression }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#imageTable').DataTable({
-                "paging": true,  // Пагинация
-                "searching": true,  // Поиск
-                "ordering": true,  // Сортировка
-                "order": [[ 0, "asc" ]],  // Сортировка по умолчанию по первой колонке (Filename)
-                "columnDefs": [
-                    { "orderable": true, "targets": 0 },  // Включить сортировку по Filename
-                    { "orderable": true, "targets": 1 },  // Включить сортировку по Size
-                    { "orderable": true, "targets": 2 },  // Включить сортировку по DPI
-                    { "orderable": true, "targets": 3 },  // Включить сортировку по Color Mode
-                    { "orderable": true, "targets": 4 }   // Включить сортировку по Compression
-                ]
-            });
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('#imageTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "order": [[0, "asc"]], // По умолчанию сортировка по имени файла
+            "columnDefs": [
+                {"orderable": true, "targets": 0},
+                {"orderable": true, "targets": 1}, // Сортировка по расширению
+                {"orderable": true, "targets": 2},
+                {"orderable": true, "targets": 3},
+                {"orderable": true, "targets": 4},
+                {"orderable": true, "targets": 5}
+            ]
         });
-    </script>
+    });
+</script>
 </body>
 </html>

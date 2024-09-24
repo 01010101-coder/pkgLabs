@@ -7,6 +7,7 @@ def get_image_info(image_path):
     try:
         with Image.open(image_path) as img:
             return {
+                "format": img.format,
                 "filename": os.path.basename(image_path),
                 "size": img.size,
                 "dpi": img.info.get("dpi", "Not available"),
