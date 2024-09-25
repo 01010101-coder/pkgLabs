@@ -9,7 +9,8 @@ import time
 from . import vlad_laba2_bp as laba2_bp
 
 UPLOAD_FOLDER = 'app/vlad/laba2/images'
-ALLOWED_EXTENSIONS = {'zip'}
+ALLOWED_EXTENSIONS = {'zip', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tif', 'tiff', 'pcx'}
+# ONE_FILE = {'jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif', '.tiff', '.pcx'}
 
 
 def allowed_file(filename):
@@ -61,7 +62,6 @@ LOG_FILE = 'performance_log.txt'
 
 
 def log_performance(message):
-    """Функция для записи времени в лог-файл."""
     with open(LOG_FILE, 'a') as log_file:
         log_file.write(message + '\n')
 
@@ -69,7 +69,7 @@ def log_performance(message):
 @laba2_bp.route('/vlad/laba2', methods=['GET', 'POST'])
 def index():
     try:
-        start_time = time.time()  # Запоминаем время начала обработки запроса
+        start_time = time.time()
         if request.method == 'POST':
             clear_upload_folder(UPLOAD_FOLDER)
 
@@ -81,7 +81,6 @@ def index():
             if not os.path.exists(UPLOAD_FOLDER):
                 os.makedirs(UPLOAD_FOLDER)
 
-            # Измеряем время распаковки файлов
             unzip_start_time = time.time()
             with ThreadPoolExecutor() as executor:
                 futures = []
@@ -90,8 +89,6 @@ def index():
                         filename = secure_filename(file.filename)
                         file_path = os.path.join(UPLOAD_FOLDER, filename)
                         file.save(file_path)
-
-                        # Параллельно распаковываем каждый архив
                         futures.append(executor.submit(unzip_file, file_path, UPLOAD_FOLDER))
 
                 for future in futures:
@@ -99,31 +96,26 @@ def index():
             unzip_time = time.time() - unzip_start_time
             log_performance(f'Время на распаковку файлов: {unzip_time:.2f} секунд')
 
-            # Убираем папку __MACOSX после распаковки
             clear_macosx_folder(UPLOAD_FOLDER)
 
-            # Измеряем время обработки изображений
             process_start_time = time.time()
             images = process_images_in_directory(UPLOAD_FOLDER)
             process_time = time.time() - process_start_time
             log_performance(f'Время на обработку изображений: {process_time:.2f} секунд')
 
-            # Измеряем время рендеринга шаблона
             render_start_time = time.time()
             response = render_template('laba2/index.html', images=images)
             render_time = time.time() - render_start_time
             log_performance(f'Время на рендеринг шаблона: {render_time:.2f} секунд')
 
-            # Очищаем папку после обработки
             clear_upload_folder(UPLOAD_FOLDER)
 
-            # Общее время выполнения запроса
             total_time = time.time() - start_time
             log_performance(f'Общее время выполнения запроса: {total_time:.2f} секунд\n')
 
             return response
 
-        # Для GET-запросов
+
         process_start_time = time.time()
         images = process_images_in_directory(UPLOAD_FOLDER)
         process_time = time.time() - process_start_time
@@ -132,11 +124,10 @@ def index():
         render_start_time = time.time()
         response = render_template('laba2/index.html', images=images)
         render_time = time.time() - render_start_time
-        log_performance(f'Время на рендеринг шаблона: {render_time:.2f} секунд')
+        log_performance(f'Время на рендеринг шаблона: {render_time:.2f} секунд \n')
 
         return response
 
     except Exception as e:
         log_performance(f'Error in index route: {e}')
         return render_template('laba2/error.html', error=str(e)), 500
-

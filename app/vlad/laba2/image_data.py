@@ -6,11 +6,19 @@ from concurrent.futures import ThreadPoolExecutor
 def get_image_info(image_path):
     try:
         with Image.open(image_path) as img:
+            if img.mode == 'RGB':
+                color_depth = 8 * 3
+            elif img.mode == 'RGBA':
+                color_depth = 8 * 4
+            elif img.mode == 'L':
+                color_depth = 8
+            else:
+                color_depth = "Unknown"
             return {
                 "format": img.format,
                 "filename": os.path.basename(image_path),
                 "size": img.size,
-                "dpi": img.info.get("dpi", "Not available"),
+                "color_depth": color_depth,
                 "mode": img.mode,
                 "compression": img.info.get("compression", "Not available")
             }
