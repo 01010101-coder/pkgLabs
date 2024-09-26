@@ -10,7 +10,6 @@ from . import vlad_laba2_bp as laba2_bp
 
 UPLOAD_FOLDER = 'app/vlad/laba2/images'
 ALLOWED_EXTENSIONS = {'zip', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tif', 'tiff', 'pcx'}
-# ONE_FILE = {'jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif', '.tiff', '.pcx'}
 
 
 def allowed_file(filename):

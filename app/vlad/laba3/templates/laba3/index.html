@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обработка изображений</title>
+    <style>
+        body {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .pyramid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        img {
+            height: auto;
+        }
+
+        /* Для верхнего уровня (одно изображение) */
+        .row-1 img {
+            width: 1000px; /* Устанавливаем фиксированную ширину в 1000px для исходного изображения */
+        }
+
+        /* Для среднего уровня (два изображения) */
+        .row-2 img {
+            width: 900px;
+        }
+
+        /* Для нижнего уровня (три изображения) */
+        .row-3 img {
+           width: 700px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Загрузка и обработка изображения</h1>
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <input type="submit" value="Загрузить и обработать">
+    </form>
+
+    {% if filename %}
+    <div class="pyramid">
+        <!-- Верхний уровень пирамиды -->
+        <div class="row row-1">
+            <div>
+                <h2>Исходное изображение:</h2>
+                <img src="{{ url_for('static', filename='laba3/uploads/' + filename) }}" alt="Исходное изображение">
+            </div>
+        </div>
+
+        <!-- Средний уровень пирамиды (два изображения) -->
+        <div class="row row-2">
+            <div>
+                <h2>Локальная пороговая обработка:</h2>
+                <img src="{{ url_for('static', filename='laba3/uploads/' + local_thresh_filename) }}" alt="Локальная пороговая обработка">
+            </div>
+            <div>
+                <h2>Адаптивная пороговая обработка:</h2>
+                <img src="{{ url_for('static', filename='laba3/uploads/' + adaptive_thresh_filename) }}" alt="Адаптивная пороговая обработка">
+            </div>
+        </div>
+
+        <!-- Нижний уровень пирамиды (три изображения) -->
+        <div class="row row-3">
+            <div>
+                <h2>Обнаружение линий:</h2>
+                <img src="{{ url_for('static', filename='laba3/uploads/' + lines_filename) }}" alt="Обнаружение линий">
+            </div>
+            <div>
+                <h2>Обнаружение точек (углов):</h2>
+                <img src="{{ url_for('static', filename='laba3/uploads/' + corners_filename) }}" alt="Обнаружение точек (углов)">
+            </div>
+            <div>
+                <h2>Сегментация по перепадам яркости:</h2>
+                <img src="{{ url_for('static', filename='laba3/uploads/' + edges_dilated_filename) }}" alt="Сегментация по перепадам яркости">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Отправка POST-запроса для очистки папки после загрузки страницы
+            fetch('/vlad/laba3/clear_uploads', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Uploads cleared successfully');
+                } else {
+                    console.error('Failed to clear uploads');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        };
+    </script>
+    {% endif %}
+</body>
+</html>
