@@ -152,28 +152,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function toggleDescription(id) {
-            const element = document.getElementById(id);
-            element.classList.toggle('show-description');
-        }
-
-        window.onload = function() {
-            // Отправка POST-запроса для очистки папки после загрузки страницы
-            fetch('/vlad/laba3/clear_uploads', {
-                method: 'POST'
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log('Uploads cleared successfully');
-                } else {
-                    console.error('Failed to clear uploads');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        };
-    </script>
     {% endif %}
 </body>
 </html>

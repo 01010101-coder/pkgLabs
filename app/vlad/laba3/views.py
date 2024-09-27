@@ -14,6 +14,7 @@ def allowed_file(filename):
 
 
 def clear_upload_folder(folder):
+    """Функция для очистки папки с загрузками"""
     for root, dirs, files in os.walk(folder):
         for file in files:
             file_path = os.path.join(root, file)
@@ -31,6 +32,10 @@ def index():
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
 
+        # Очищаем папку перед загрузкой нового файла
+        clear_upload_folder(UPLOAD_FOLDER)
+
+        # Проверяем, есть ли файл в запросе
         if 'file' not in request.files:
             return 'No file part'
 
@@ -69,12 +74,3 @@ def index():
                                    edges_dilated_filename='edges_dilated.jpg')
 
     return render_template('laba3/index.html')
-
-
-@bp.route('/vlad/laba3/clear_uploads', methods=['POST'])
-def clear_uploads():
-    try:
-        clear_upload_folder(UPLOAD_FOLDER)
-        return 'Uploads cleared', 200
-    except Exception as e:
-        return f'Error: {e}', 500
