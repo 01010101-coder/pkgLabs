@@ -8,14 +8,24 @@ def load_image(file_path):
     return image
 
 
-def local_threshold(image):
-    """Применение локальной пороговой обработки (адаптивный порог)"""
+def local_threshold(image, block_size=15, C=5):
+    """Локальная пороговая обработка изображения"""
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    thresholded = cv2.adaptiveThreshold(
-        gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-        cv2.THRESH_BINARY, 11, 2
-    )
-    return thresholded
+
+    # Вычисляем количество блоков по ширине и высоте изображения
+    h, w = gray.shape
+    for i in range(0, h, block_size):
+        for j in range(0, w, block_size):
+            # Получаем текущий блок изображения
+            block = gray[i:i + block_size, j:j + block_size]
+
+            # Вычисляем порог для данного блока как среднее значение интенсивностей
+            threshold = np.mean(block) - C
+
+            # Применяем порог к блоку
+            gray[i:i + block_size, j:j + block_size] = (block > threshold).astype(np.uint8) * 255
+
+    return gray
 
 
 def adaptive_threshold(image):

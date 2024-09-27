@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,24 +27,53 @@
             width: 100%;
         }
 
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         img {
             height: auto;
         }
 
-        /* Для верхнего уровня (одно изображение) */
         .row-1 img {
-            width: 1000px; /* Устанавливаем фиксированную ширину в 1000px для исходного изображения */
+            width: 1000px;
         }
 
-        /* Для среднего уровня (два изображения) */
         .row-2 img {
             width: 900px;
         }
 
-        /* Для нижнего уровня (три изображения) */
         .row-3 img {
-           width: 700px;
+            width: 700px;
         }
+
+        .description {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .show-description {
+            max-height: 200px; /* Максимальная высота для открытого состояния */
+        }
+
+        .description-content {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 5px 15px;
+            font-size: 16px;
+        }
+
     </style>
 </head>
 <body>
@@ -59,7 +88,7 @@
     <div class="pyramid">
         <!-- Верхний уровень пирамиды -->
         <div class="row row-1">
-            <div>
+            <div class="image-container">
                 <h2>Исходное изображение:</h2>
                 <img src="{{ url_for('static', filename='laba3/uploads/' + filename) }}" alt="Исходное изображение">
             </div>
@@ -67,34 +96,69 @@
 
         <!-- Средний уровень пирамиды (два изображения) -->
         <div class="row row-2">
-            <div>
+            <div class="image-container">
                 <h2>Локальная пороговая обработка:</h2>
                 <img src="{{ url_for('static', filename='laba3/uploads/' + local_thresh_filename) }}" alt="Локальная пороговая обработка">
+                <button onclick="toggleDescription('local-desc')">Описание</button>
+                <div id="local-desc" class="description">
+                    <div class="description-content">
+                        Этот алгоритм делит изображение на блоки (маленькие участки) и для каждого блока вычисляет пороговое значение на основе среднего значения интенсивностей пикселей в блоке. Каждый блок обрабатывается отдельно, и порог применяется к нему, что позволяет учитывать локальные особенности изображения. Такой подход особенно полезен для изображений с неоднородной освещенностью или сложной структурой.
+                    </div>
+                </div>
             </div>
-            <div>
+            <div class="image-container">
                 <h2>Адаптивная пороговая обработка:</h2>
                 <img src="{{ url_for('static', filename='laba3/uploads/' + adaptive_thresh_filename) }}" alt="Адаптивная пороговая обработка">
+                <button onclick="toggleDescription('adaptive-desc')">Описание</button>
+                <div id="adaptive-desc" class="description">
+                    <div class="description-content">
+                        В адаптивной пороговой обработке порог для каждого пикселя рассчитывается на основе области вокруг него (вместо применения одного глобального порога). Это позволяет автоматически адаптироваться к различным уровням освещенности и деталям изображения. В данном случае используется метод с гауссовым средним, где порог для каждой точки вычисляется с помощью взвешенного среднего значений яркости ближайших пикселей.
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Нижний уровень пирамиды (три изображения) -->
         <div class="row row-3">
-            <div>
+            <div class="image-container">
                 <h2>Обнаружение линий:</h2>
                 <img src="{{ url_for('static', filename='laba3/uploads/' + lines_filename) }}" alt="Обнаружение линий">
+                <button onclick="toggleDescription('lines-desc')">Описание</button>
+                <div id="lines-desc" class="description">
+                    <div class="description-content">
+                        Этот алгоритм использует оператор Кэнни для обнаружения границ (перепадов яркости) и преобразование Хафа для поиска прямых линий. Преобразование Хафа работает путем преобразования точек с краев изображения в пространство параметров, где они формируют линии. В результате линии рисуются на изображении, что позволяет выделять структурированные элементы, такие как грани объектов.
+                    </div>
+                </div>
             </div>
-            <div>
+            <div class="image-container">
                 <h2>Обнаружение точек (углов):</h2>
                 <img src="{{ url_for('static', filename='laba3/uploads/' + corners_filename) }}" alt="Обнаружение точек (углов)">
+                <button onclick="toggleDescription('corners-desc')">Описание</button>
+                <div id="corners-desc" class="description">
+                    <div class="description-content">
+                        Метод Shi-Tomasi для обнаружения углов основан на нахождении точек с резкими перепадами яркости в двух направлениях. Это позволяет находить интересные ключевые точки, такие как углы зданий, пересечения линий или важные элементы на изображении. Этот алгоритм используется, когда важно выделить точки, которые могут быть характерными для объекта.
+                    </div>
+                </div>
             </div>
-            <div>
+            <div class="image-container">
                 <h2>Сегментация по перепадам яркости:</h2>
                 <img src="{{ url_for('static', filename='laba3/uploads/' + edges_dilated_filename) }}" alt="Сегментация по перепадам яркости">
+                <button onclick="toggleDescription('edges-desc')">Описание</button>
+                <div id="edges-desc" class="description">
+                    <div class="description-content">
+                        Алгоритм сегментации использует операторы Sobel и Кэнни для выделения градиентов (перепадов яркости), что позволяет выделять контуры объектов на изображении. Операции с градиентами помогают находить области с резким изменением интенсивности пикселей, такие как границы объектов. В итоге результат сегментации улучшает восприятие краев, а также можно применить морфологические операции для усиления линий.
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        function toggleDescription(id) {
+            const element = document.getElementById(id);
+            element.classList.toggle('show-description');
+        }
+
         window.onload = function() {
             // Отправка POST-запроса для очистки папки после загрузки страницы
             fetch('/vlad/laba3/clear_uploads', {
