@@ -87,10 +87,8 @@ def segment_brightness(image):
     """Сегментация изображения по перепадам яркости с использованием градиентов Sobel и Canny"""
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    # Используем алгоритм Canny для выделения краев
     edges = cv2.Canny(gray, 100, 200)
 
-    # Опционально: Применение морфологических операций для улучшения результата
     kernel = np.ones((3, 3), np.uint8)
     edges_dilated = cv2.dilate(edges, kernel, iterations=1)
 

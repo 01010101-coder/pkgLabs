@@ -5,7 +5,8 @@ from werkzeug.utils import secure_filename
 from .image_processing import load_image, local_threshold, adaptive_threshold, segment_image, segment_brightness
 import cv2
 
-UPLOAD_FOLDER = 'pkgLabs/static/laba3/uploads/'
+# UPLOAD_FOLDER = 'pkgLab/static/laba3/uploads/' - для сервера
+UPLOAD_FOLDER = 'static/laba3/uploads/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 

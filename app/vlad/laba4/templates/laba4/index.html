@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Алгоритмы растеризации</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: #f0f0f0;
+            display: block;
+            margin: 0 auto;
+        }
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .controls label {
+            margin-right: 10px;
+        }
+        .controls input {
+            margin: 5px;
+            width: 60px;
+        }
+        .time-output, .segment-output {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .example {
+            margin-top: 20px;
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .example {
+            margin-top: 20px;
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Алгоритмы растеризации</h1>
+
+    <div class="controls">
+        <label for="algorithm">Выберите алгоритм:</label>
+        <select id="algorithm">
+            <option value="bezier">Кривая Безье</option>
+            <option value="dda">Алгоритм ЦДА</option>
+            <option value="bresenhamLine">Алгоритм Брезенхема (Отрезок)</option>
+            <option value="bresenhamCircle">Алгоритм Брезенхема (Окружность)</option>
+        </select>
+        <br><br>
+        <label for="x1">P0.x:</label>
+        <input type="number" id="x1" value="-5">
+        <label for="y1">P0.y:</label>
+        <input type="number" id="y1" value="-3">
+        <br><br>
+        <label for="x2">P1.x:</label>
+        <input type="number" id="x2" value="0">
+        <label for="y2">P1.y:</label>
+        <input type="number" id="y2" value="5">
+        <br><br>
+        <label for="x3">P2.x:</label>
+        <input type="number" id="x3" value="5">
+        <label for="y3">P2.y:</label>
+        <input type="number" id="y3" value="0">
+        <br><br>
+        <label for="radius">Радиус:</label>
+        <input type="number" id="radius" value="5">
+        <br><br>
+        <button onclick="draw()">Нарисовать</button>
+    </div>
+
+    <canvas id="canvas" width="800" height="800"></canvas>
+
+    <div class="segment-output" id="segment-output"></div>
+    <div class="time-output" id="time-output"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>x</th>
+                <th>y</th>
+            </tr>
+        </thead>
+        <tbody id="points-table-body"></tbody>
+    </table>
+
+    <div class="example">
+        <h3>Пример с полными вычислениями (Алгоритм Брезенхема для отрезка)</h3>
+        <p>Дано: Начальная точка: (x1, y1) = (-5, -3), Конечная точка: (x2, y2) = (5, 3)</p>
+        <p>1. Сначала находим dx и dy:</p>
+        <p><strong>dx = |x2 - x1| = |5 - (-5)| = 10</strong></p>
+        <p><strong>dy = |y2 - y1| = |3 - (-3)| = 6</strong></p>
+        <p>2. Вычисляем начальные параметры:</p>
+        <p><strong>sx = 1 (так как x1 < x2)</strong></p>
+        <p><strong>sy = 1 (так как y1 < y2)</strong></p>
+        <p><strong>err = dx - dy = 10 - 6 = 4</strong></p>
+        <p>3. Процесс растеризации:</p>
+        <p><strong>1-й шаг: x = -5, y = -3, err = 4 (выбираем следующий пиксель, увеличиваем x на 1, err = 4 - 6 = -2)</strong></p>
+        <p><strong>2-й шаг: x = -4, y = -3, err = -2 (выбираем следующий пиксель, увеличиваем y на 1, err = -2 + 10 = 8)</strong></p>
+        <p><strong>3-й шаг: x = -3, y = -2, err = 8 (выбираем следующий пиксель, увеличиваем x на 1, err = 8 - 6 = 2)</strong></p>
+        <p><strong>4-й шаг: x = -2, y = -2, err = 2 (выбираем следующий пиксель, увеличиваем x на 1, err = 2 - 6 = -4)</strong></p>
+        <p><strong>5-й шаг: x = -1, y = -1, err = -4 (выбираем следующий пиксель, увеличиваем y на 1, err = -4 + 10 = 6)</strong></p>
+        <p><strong>6-й шаг: x = 0, y = -1, err = 6 (выбираем следующий пиксель, увеличиваем x на 1, err = 6 - 6 = 0)</strong></p>
+        <p><strong>7-й шаг: x = 1, y = 0, err = 0 (выбираем следующий пиксель, увеличиваем x на 1, err = 0 - 6 = -6)</strong></p>
+        <p><strong>8-й шаг: x = 2, y = 1, err = -6 (выбираем следующий пиксель, увеличиваем y на 1, err = -6 + 10 = 4)</strong></p>
+        <p><strong>9-й шаг: x = 3, y = 1, err = 4 (выбираем следующий пиксель, увеличиваем x на 1, err = 4 - 6 = -2)</strong></p>
+        <p><strong>10-й шаг: x = 4, y = 2, err = -2 (выбираем следующий пиксель, увеличиваем y на 1, err = -2 + 10 = 8)</strong></p>
+        <p><strong>11-й шаг: x = 5, y = 3, err = 8 (достигнута конечная точка)</strong></p>
+        <p>Таким образом, все пиксели отрезка от (-5, -3) до (5, 3) были пройдены в процессе работы алгоритма Брезенхема.</p>
+    </div>
+
+    <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let scale = 30; // Размер одного шага на сетке
+    let offsetX = canvas.width / 2; // Начальная позиция по X
+    let offsetY = canvas.height / 2; // Начальная позиция по Y
+    let isDragging = false; // Флаг для перетаскивания
+    let lastX = 0, lastY = 0; // Последние координаты мыши при перетаскивании
+
+    // Отрисовка сетки
+    function drawGrid() {
+        const step = scale;
+        ctx.strokeStyle = '#d3d3d3';
+        ctx.lineWidth = 0.5;
+
+        for (let y = offsetY % step; y < canvas.height; y += step) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+
+        for (let x = offsetX % step; x < canvas.width; x += step) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(offsetX, 0);
+        ctx.lineTo(offsetX, canvas.height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, offsetY);
+        ctx.lineTo(canvas.width, offsetY);
+        ctx.stroke();
+    }
+
+    // Функция для отображения пикселя
+    function plotPixel(x, y, color = 'red') {
+        ctx.fillStyle = color;
+        ctx.fillRect(offsetX + x * scale - 2, offsetY - y * scale - 2, 4, 4);
+    }
+
+    // Добавление точки в таблицу
+    function addPointToTable(x, y) {
+        const tableBody = document.getElementById('points-table-body');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${tableBody.rows.length + 1}</td>
+            <td>${x}</td>
+            <td>${y}</td>
+        `;
+        tableBody.appendChild(row);
+    }
+
+    // Алгоритм ДДА
+    function ddaAlgorithm(x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const steps = Math.max(Math.abs(dx), Math.abs(dy));
+
+        const xInc = dx / steps;
+        const yInc = dy / steps;
+
+        let x = x1;
+        let y = y1;
+        for (let i = 0; i <= steps; i++) {
+            plotPixel(Math.round(x), Math.round(y));
+            addPointToTable(Math.round(x), Math.round(y));
+            x += xInc;
+            y += yInc;
+        }
+    }
+
+    // Алгоритм Брезенхема для отрезка
+    function bresenhamLine(x1, y1, x2, y2) {
+        const dx = Math.abs(x2 - x1);
+        const dy = Math.abs(y2 - y1);
+        const sx = x1 < x2 ? 1 : -1;
+        const sy = y1 < y2 ? 1 : -1;
+        let err = dx - dy;
+
+        while (true) {
+            plotPixel(x1, y1);
+            addPointToTable(x1, y1);
+            if (x1 === x2 && y1 === y2) break;
+            const e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                x1 += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y1 += sy;
+            }
+        }
+    }
+
+    // Алгоритм Брезенхема для окружности
+    function bresenhamCircle(xc, yc, r) {
+        let x = 0, y = r;
+        let p = 1 - r;
+
+        while (x <= y) {
+            [
+                [xc + x, yc + y],
+                [xc - x, yc + y],
+                [xc + x, yc - y],
+                [xc - x, yc - y],
+                [xc + y, yc + x],
+                [xc - y, yc + x],
+                [xc + y, yc - x],
+                [xc - y, yc - x]
+            ].forEach(([px, py]) => {
+                plotPixel(px, py);
+                addPointToTable(px, py);
+            });
+
+            x++;
+            if (p < 0) {
+                p += 2 * x + 1;
+            } else {
+                y--;
+                p += 2 * (x - y) + 1;
+            }
+        }
+    }
+
+    // Алгоритм для кривой Безье
+    function bezierCurve(P0, P1, P2, steps) {
+        const dt = 1 / steps;
+        for (let i = 0; i <= steps; i++) {
+            const t = i * dt;
+            const P_t = {
+                x: (1 - t) ** 2 * P0.x + 2 * (1 - t) * t * P1.x + t ** 2 * P2.x,
+                y: (1 - t) ** 2 * P0.y + 2 * (1 - t) * t * P1.y + t ** 2 * P2.y,
+            };
+            plotPixel(P_t.x, P_t.y);
+            addPointToTable(P_t.x.toFixed(2), P_t.y.toFixed(2));
+        }
+    }
+
+    // Основная функция рисования
+    function draw() {
+        const x1 = parseFloat(document.getElementById("x1").value);
+        const y1 = parseFloat(document.getElementById("y1").value);
+        const x2 = parseFloat(document.getElementById("x2").value);
+        const y2 = parseFloat(document.getElementById("y2").value);
+        const x3 = parseFloat(document.getElementById("x3").value);
+        const y3 = parseFloat(document.getElementById("y3").value);
+        const r = parseInt(document.getElementById("radius").value);
+        const algorithm = document.getElementById("algorithm").value;
+
+        // Очистка канваса и таблицы
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById("points-table-body").innerHTML = "";
+        drawGrid();
+
+        const startTime = performance.now();
+
+        switch (algorithm) {
+            case "bezier":
+                bezierCurve({ x: x1, y: y1 }, { x: x2, y: y2 }, { x: x3, y: y3 }, 50);
+                break;
+            case "dda":
+                ddaAlgorithm(x1, y1, x2, y2);
+                break;
+            case "bresenhamLine":
+                bresenhamLine(x1, y1, x2, y2);
+                break;
+            case "bresenhamCircle":
+                bresenhamCircle(x1, y1, r);
+                break;
+        }
+
+        const endTime = performance.now();
+        document.getElementById("time-output").textContent = `Время выполнения: ${(endTime - startTime).toFixed(2)} мс`;
+    }
+
+    // Обработчики для перетаскивания
+    canvas.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+            const dx = e.clientX - lastX;
+            const dy = e.clientY - lastY;
+
+            offsetX += dx;
+            offsetY += dy;
+
+            lastX = e.clientX;
+            lastY = e.clientY;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            draw();
+        }
+    });
+
+    canvas.addEventListener("mouseup", () => {
+        isDragging = false;
+    });
+
+    // Обработчик для масштабирования
+    canvas.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const zoomFactor = 1.1;
+
+        if (e.deltaY < 0) {
+            scale *= zoomFactor;
+        } else {
+            scale /= zoomFactor;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+        draw();
+    });
+
+    // Сетку рисуем при загрузке страницы
+    drawGrid();
+    </script>
+</body>
+</html>
